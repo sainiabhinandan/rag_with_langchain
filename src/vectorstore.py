@@ -60,7 +60,7 @@ class FaissVectorStore:
         print(f"[INFO] Loaded Faiss index and metadata from {self.persist_dir}")
 
     def search(self ,query_embedding: np.ndarray, top_k: int=5):
-        I,D= self.index.search(query_embedding,top_k,)   
+        D,I= self.index.search(query_embedding,top_k,)   
         results=[] 
         for idx,dist in zip(I[0],D[0]):
             meta= self.metadata[idx] if idx < len(self.metadata) else None
@@ -71,6 +71,15 @@ class FaissVectorStore:
         query_embedding= self.model.encode([query_text]).astype('float32')
         return self.search(query_embedding,top_k=top_k)
     
+
+    # Example usage
+if __name__ == "__main__":
+    from data_loader import load_all_documents
+    docs = load_all_documents("..\\data")
+    store = FaissVectorStore("faiss_store")
+    store.build_from_documents(docs)
+    store.load()
+    print(store.query("What is attention mechanism?", top_k=3))
     
     
 
